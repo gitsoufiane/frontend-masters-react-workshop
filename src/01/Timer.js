@@ -4,11 +4,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { ProgressCircle } from '../ProgressCircle';
 
-// import { useMachine } from '@xstate/react';
+import { useMachine } from '@xstate/react';
 import { timerMachine } from './timerMachine';
 
 export const Timer = () => {
-  const [state, send] = [{}, () => {}];
+  const [state, send] = useMachine(timerMachine)
+  const status = state.value
 
   const { duration, elapsed, interval } = {
     duration: 60,
@@ -19,7 +20,7 @@ export const Timer = () => {
   return (
     <div
       className="timer"
-      data-state={state.value} // Hint!
+      data-state={status}
       style={{
         // @ts-ignore
         '--duration': duration,
@@ -32,20 +33,20 @@ export const Timer = () => {
       </header>
       <ProgressCircle />
       <div className="display">
-        <div className="label">{state.value}</div>
+        <div className="label">{status}</div>
         <div
           className="elapsed"
           onClick={() => {
-            // ...
+            send('TOGGLE')
           }}
         >
           {Math.ceil(duration - elapsed)}
         </div>
         <div className="controls">
-          {state === 'paused' && (
+          {status === 'paused' && (
             <button
               onClick={() => {
-                // ...
+                send('RESET')
               }}
             >
               Reset
@@ -54,10 +55,10 @@ export const Timer = () => {
         </div>
       </div>
       <div className="actions">
-        {state === 'running' && (
+        {status === 'running' && (
           <button
             onClick={() => {
-              // ...
+              send('TOGGLE')
             }}
             title="Pause timer"
           >
@@ -65,10 +66,10 @@ export const Timer = () => {
           </button>
         )}
 
-        {(state === 'paused' || state === 'idle') && (
+        {(status === 'paused' || status === 'idle') && (
           <button
             onClick={() => {
-              // ...
+              send('TOGGLE')
             }}
             title="Start timer"
           >
