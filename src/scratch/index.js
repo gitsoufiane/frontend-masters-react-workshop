@@ -1,10 +1,13 @@
 import React from 'react';
-import { createMachine } from 'xstate';
-import { useMachine } from '@xstate/react';
+import { createMachine ,assign} from 'xstate';
+import { useMachine  } from '@xstate/react';
 
 
 const alarmMachine = createMachine({
   initial: 'inactive',
+  context: {
+    count: 10
+  },
   states: {
     inactive: {
       on: {
@@ -19,7 +22,12 @@ const alarmMachine = createMachine({
     },
     active: {
       on: {
-        TOGGLE: 'inactive'
+        TOGGLE: {
+          target: 'inactive',
+          actions: assign({
+            count: (context,event)=> context.count + 1
+          })
+        }
       }
     },
   }
@@ -28,9 +36,10 @@ const alarmMachine = createMachine({
 export const ScratchApp = () => {
   const [state, send] = useMachine(alarmMachine)
   const status = state.value
+  const {count}=state.context
 
   React.useEffect(() => { 
-    const timer = setTimeout(() => send({ type: 'SUCCESS' }), 3000)
+    const timer = setTimeout(() => send({ type: 'SUCCESS' }), 1000)
     return ()=> clearTimeout(timer)
   },[status,send])
   return (
@@ -41,6 +50,7 @@ export const ScratchApp = () => {
             hour: '2-digit',
             minute: '2-digit',
           })}
+          ({count})
         </div>
         <div className="alarmToggle" data-active={status==='active' || undefined} onClick={()=>send({type:'TOGGLE'})}></div>
       </div>
