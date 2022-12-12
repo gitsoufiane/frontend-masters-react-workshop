@@ -24,14 +24,18 @@ const alarmMachine = createMachine({
       on: {
         TOGGLE: {
           target: 'inactive',
-          actions: assign({
-            count: (context,event)=> context.count + 1
-          })
+          actions: 'incrementCount'
         }
       }
     },
-  }
-})
+  },
+},  {
+    actions: {
+      incrementCount: assign({
+        count: ctx=> ctx.count + 1
+      })
+    }
+  })
 
 export const ScratchApp = () => {
   const [state, send] = useMachine(alarmMachine)

@@ -14,11 +14,7 @@ export const timerMachine = createMachine({
   },
   states: {
     idle: {
-      // Parameterize this action:
-      entry: assign({
-        duration: 60,
-        elapsed: 0,
-      }),
+      entry: 'resetAction',
 
       on: {
         TOGGLE: 'running',
@@ -26,15 +22,13 @@ export const timerMachine = createMachine({
     },
     running: {
       on: {
-        // On the TICK event, the context.elapsed should be incremented by context.interval
-        // ...
+        TICK: {
+          actions: 'tickAction'
+        },
 
         TOGGLE: 'paused',
         ADD_MINUTE: {
-          // Parameterize this action:
-          actions: assign({
-            duration: (ctx) => ctx.duration + 60,
-          }),
+          actions: 'addMinuteAction'
         },
       },
     },
@@ -45,4 +39,17 @@ export const timerMachine = createMachine({
       },
     },
   },
+}, {
+  actions: {
+    resetAction: assign({
+        duration: 60,
+        elapsed: 0,
+    }),
+    addMinuteAction:assign({
+            duration: (ctx) => ctx.duration + 60,
+    }),
+    tickAction: assign({
+      elapsed:ctx=> ctx.elapsed+ctx.interval
+    })
+  }
 });
