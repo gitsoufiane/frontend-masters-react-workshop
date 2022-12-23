@@ -20,7 +20,6 @@ export const Timer = () => {
       }, interval * 1000)
       return ()=> clearInterval(intervalId)
     }
-    
   },[state.value])
 
   return (
