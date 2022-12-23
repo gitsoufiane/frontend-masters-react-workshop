@@ -1,10 +1,5 @@
 import { createMachine, assign } from 'xstate';
 
-// Parameterize the assign actions here:
-// const tick = ...
-// const addMinute = ...
-// const reset = ...
-
 export const timerMachine = createMachine({
   initial: 'idle',
   context: {
@@ -15,7 +10,6 @@ export const timerMachine = createMachine({
   states: {
     idle: {
       entry: 'resetAction',
-
       on: {
         TOGGLE: 'running',
       },
@@ -25,7 +19,6 @@ export const timerMachine = createMachine({
         TICK: {
           actions: 'tickAction'
         },
-
         TOGGLE: 'paused',
         ADD_MINUTE: {
           actions: 'addMinuteAction'

@@ -11,10 +11,14 @@ const alarmMachine = createMachine({
   states: {
     inactive: {
       on: {
-        TOGGLE: 'pending',
+        TOGGLE: {
+          actions: 'telemetry',
+          target: 'pending'
+        },
       }
     },
     pending: {
+      entry: 'telemetry',
       on: {
         SUCCESS: 'active',
         TOGGLE: 'inactive'
@@ -32,20 +36,23 @@ const alarmMachine = createMachine({
 },  {
     actions: {
       incrementCount: assign({
-        count: ctx=> ctx.count + 1
-      })
+        count: (ctx,event)=> ctx.count + 1
+      }),
+      telemetry: (ctx,event)=> console.log({ctx,event})
     }
   })
 
 export const ScratchApp = () => {
-  const [state, send] = useMachine(alarmMachine)
+  const [state, send,service] = useMachine(alarmMachine)
+  //value of the state
   const status = state.value
   const {count}=state.context
 
   React.useEffect(() => { 
     const timer = setTimeout(() => send({ type: 'SUCCESS' }), 1000)
     return ()=> clearTimeout(timer)
-  },[status,send])
+  }, [status, send])
+  
   return (
     <div className="scratch">
       <div className="alarm">

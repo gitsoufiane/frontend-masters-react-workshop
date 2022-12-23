@@ -13,8 +13,6 @@ export const Timer = () => {
 
   const { duration, elapsed, interval } = state.context;
 
-  // Add a useEffect(...) here to send a TICK event on every `interval`
-  // ...
   useEffect(() => { 
     if (state.value === 'running') {
       const intervalId = setInterval(() => {
