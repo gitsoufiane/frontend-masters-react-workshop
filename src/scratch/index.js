@@ -6,15 +6,19 @@ import { useMachine  } from '@xstate/react';
 const alarmMachine = createMachine({
   initial: 'inactive',
   context: {
-    count: 10
+    count: 0
   },
   states: {
     inactive: {
       on: {
-        TOGGLE: {
-          actions: 'telemetry',
-          target: 'pending'
+        TOGGLE: [{
+          target: 'pending',
+          actions: 'incrementCount',
+          cond: 'tooMuch' //! Guarded transition
         },
+        {
+            target: 'rejected' //! if  previous cond is false , use this target
+        }]
       }
     },
     pending: {
@@ -32,6 +36,7 @@ const alarmMachine = createMachine({
         }
       }
     },
+    rejected: {}
   },
 },  {
     actions: {
@@ -39,7 +44,10 @@ const alarmMachine = createMachine({
         count: (ctx,event)=> ctx.count + 1
       }),
       telemetry: (ctx,event)=> console.log({ctx,event})
-    }
+  },
+  guards: {
+    tooMuch: (ctx,event)=> ctx.count <5 
+  }
   })
 
 export const ScratchApp = () => {
@@ -61,7 +69,7 @@ export const ScratchApp = () => {
             hour: '2-digit',
             minute: '2-digit',
           })}
-          ({count})
+          ({count}) ({state.toStrings().join(' ')})
         </div>
         <div className="alarmToggle" data-active={status==='active' || undefined} onClick={()=>send({type:'TOGGLE'})}></div>
       </div>
